@@ -1,5 +1,6 @@
 package com.erank.tasks;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -8,14 +9,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskVH> {
 
     private List<UserTask> tasks;
+    private TaskClickCallback callback;
 
     public TasksAdapter() {
         tasks = new ArrayList<>();
+    }
+
+    public void setCallback(TaskClickCallback callback) {
+        this.callback = callback;
     }
 
     public void setTasks(List<UserTask> tasks) {
@@ -44,13 +51,20 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskVH> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TaskVH holder, int position) {
-        holder.fill(tasks.get(position));
+    public void onBindViewHolder(@NonNull TaskVH holder, int pos) {
+        UserTask task = tasks.get(pos);
+        holder.fill(task);
+        holder.itemView.setOnClickListener(v -> callback.onTaskTapped(task, pos));
     }
 
     @Override
     public int getItemCount() {
         return tasks.size();
+    }
+
+    public void sort() {
+        Collections.sort(tasks, (task, t1) -> task.getState().compareTo(t1.getState()));
+        notifyDataSetChanged();
     }
 
     static class TaskVH extends RecyclerView.ViewHolder {
@@ -66,6 +80,21 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskVH> {
 
         void fill(UserTask task) {
             descET.setText(task.getDescription());
+
+            switch (task.getState()) {
+                case PROCESSING:
+                    itemView.setBackgroundColor(Color.GREEN);
+                    break;
+
+                case READY:
+                    itemView.setBackgroundColor(Color.WHITE);
+                    break;
+
+                case DONE:
+                    itemView.setBackgroundColor(0xFFF57C00);
+                    break;
+            }
+
         }
     }
 }

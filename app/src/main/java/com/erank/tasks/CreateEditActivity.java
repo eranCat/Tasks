@@ -1,14 +1,20 @@
 package com.erank.tasks;
 
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import static android.R.layout.simple_spinner_dropdown_item;
 
 public class CreateEditActivity extends AppCompatActivity {
 
     private EditText descriptionET;
+    private Spinner stateSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,9 +22,20 @@ public class CreateEditActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_edit);
 
         descriptionET = findViewById(R.id.desc_et);
+        stateSpinner = findViewById(R.id.state_spinner);
 
         Button createBtn = findViewById(R.id.create_btn);
         createBtn.setOnClickListener(view -> createTask());
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this, simple_spinner_dropdown_item);
+
+        for (TaskState state : TaskState.values()) {
+            arrayAdapter.add(state.capitalizedName());
+        }
+
+        stateSpinner.setAdapter(arrayAdapter);
+        stateSpinner.setSelection(1);//Set to ready
     }
 
     private void createTask() {
@@ -29,10 +46,27 @@ public class CreateEditActivity extends AppCompatActivity {
         }
         descriptionET.setError(null);
 
-        UserTask userTask = new UserTask(desc);
+        int selectedItem = stateSpinner.getSelectedItemPosition();
+        TaskState state = TaskState.values()[selectedItem];
+        addTaskAndClose(desc, state);
+    }
+
+    private void addTaskAndClose(String desc, TaskState state) {
+
+        UserTask userTask = new UserTask(desc, state);
         DataManger.getInstance().addTask(userTask);
-        setResult(RESULT_OK);
-        finish();
+
+        Runnable finishAction = () -> {
+            setResult(RESULT_OK);
+            finish();
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle("Good news")
+                .setMessage("Added successfully!")
+                .setPositiveButton("OK", (d, i) -> finishAction.run())
+                .setOnDismissListener(d -> finishAction.run())
+                .show();
     }
 
     @Override
