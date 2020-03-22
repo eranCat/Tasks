@@ -87,11 +87,11 @@ public class MainActivity extends AppCompatActivity implements TaskClickCallback
     }
 
     private void updateFragment(UserTask task) {
-        InfoFragment fragment = InfoFragment.newInstance(task);
+        InfoFragment infoFragment = InfoFragment.newInstance(task);
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.inner_container, fragment)
+                .replace(R.id.inner_container, infoFragment)
                 .commit();
     }
 
