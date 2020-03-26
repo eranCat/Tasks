@@ -1,11 +1,11 @@
-package com.erank.tasks;
+package com.erank.tasks.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class UserTask implements Parcelable {
-    private String description;
-    public static final Parcelable.Creator<UserTask> CREATOR = new Parcelable.Creator<UserTask>() {
+    public static final Parcelable.Creator<UserTask> CREATOR =
+            new Parcelable.Creator<UserTask>() {
         @Override
         public UserTask createFromParcel(Parcel source) {
             return new UserTask(source);
@@ -16,6 +16,8 @@ public class UserTask implements Parcelable {
             return new UserTask[size];
         }
     };
+
+    private String description;
     private TaskState state;
 
 
@@ -24,18 +26,18 @@ public class UserTask implements Parcelable {
         this.state = state;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     public UserTask(String description) {
-        this(description, TaskState.READY);
+        this(description, TaskState.TO_DO);
     }
 
     protected UserTask(Parcel in) {
         this.description = in.readString();
         int tmpState = in.readInt();
         this.state = tmpState == -1 ? null : TaskState.values()[tmpState];
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {

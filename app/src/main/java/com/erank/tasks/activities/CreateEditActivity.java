@@ -1,4 +1,4 @@
-package com.erank.tasks;
+package com.erank.tasks.activities;
 
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
@@ -8,6 +8,11 @@ import android.widget.Spinner;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.erank.tasks.R;
+import com.erank.tasks.models.TaskState;
+import com.erank.tasks.models.UserTask;
+import com.erank.tasks.utils.DataManger;
 
 import static android.R.layout.simple_spinner_dropdown_item;
 

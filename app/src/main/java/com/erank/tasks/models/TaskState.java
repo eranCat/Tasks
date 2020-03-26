@@ -1,10 +1,10 @@
-package com.erank.tasks;
+package com.erank.tasks.models;
 
 public enum TaskState {
-    PROCESSING, READY, DONE;
+    PROCESSING, TO_DO, DONE;
 
     public String capitalizedName() {
-        String name = name();
+        String name = name().replace("_", " ");
         name = name.substring(0, 1) + name.substring(1).toLowerCase();
         return name;
     }

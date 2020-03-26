@@ -1,12 +1,15 @@
-package com.erank.tasks;
+package com.erank.tasks.utils;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.erank.tasks.R;
+import com.erank.tasks.interfaces.TaskClickCallback;
+import com.erank.tasks.models.UserTask;
+import com.erank.tasks.utils.customViews.TaskCell;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,12 +20,9 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskVH> {
     private List<UserTask> tasks;
     private TaskClickCallback callback;
 
-    public TasksAdapter() {
-        tasks = new ArrayList<>();
-    }
-
-    public void setCallback(TaskClickCallback callback) {
+    public TasksAdapter(TaskClickCallback callback) {
         this.callback = callback;
+        tasks = new ArrayList<>();
     }
 
     public void setTasks(List<UserTask> tasks) {
@@ -69,32 +69,18 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskVH> {
 
     static class TaskVH extends RecyclerView.ViewHolder {
 
-        private final TextView descET;
+        private TaskCell cell;
 
         TaskVH(@NonNull ViewGroup parent) {
             super(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.task, parent, false));
+                    .inflate(R.layout.task_cell, parent, false));
 
-            descET = itemView.findViewById(R.id.desc_tv);
+            cell = itemView.findViewById(R.id.cell);
         }
 
+
         void fill(UserTask task) {
-            descET.setText(task.getDescription());
-
-            switch (task.getState()) {
-                case PROCESSING:
-                    itemView.setBackgroundColor(Color.GREEN);
-                    break;
-
-                case READY:
-                    itemView.setBackgroundColor(Color.WHITE);
-                    break;
-
-                case DONE:
-                    itemView.setBackgroundColor(0xFFF57C00);
-                    break;
-            }
-
+            cell.setTask(task);
         }
     }
 }

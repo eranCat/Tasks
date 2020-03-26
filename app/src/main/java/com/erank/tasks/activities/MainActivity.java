@@ -1,4 +1,4 @@
-package com.erank.tasks;
+package com.erank.tasks.activities;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -7,43 +7,47 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.erank.tasks.R;
+import com.erank.tasks.fragments.InfoFragment;
+import com.erank.tasks.interfaces.InfoUpdatable;
+import com.erank.tasks.interfaces.ItemUpdatable;
+import com.erank.tasks.interfaces.TaskClickCallback;
+import com.erank.tasks.models.UserTask;
+import com.erank.tasks.utils.DataManger;
+import com.erank.tasks.utils.TasksAdapter;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements TaskClickCallback {
+public class MainActivity extends AppCompatActivity
+        implements TaskClickCallback, ItemUpdatable {
 
     private final int RC_ADD = 123;//check
     private TasksAdapter tasksAdapter;
-    private View container;
-    private DataManger dm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dm = DataManger.getInstance();
+        findViewById(R.id.add).setOnClickListener(v -> openAddActivity());
 
-        findViewById(R.id.add)
-                .setOnClickListener(v -> openAddActivity());
+        tasksAdapter = new TasksAdapter(this);
 
-        tasksAdapter = new TasksAdapter();
-        tasksAdapter.setCallback(this);
-
-        List<UserTask> tasks = dm.getTasks();
+        List<UserTask> tasks = DataManger.getInstance().getTasks();
         tasksAdapter.setTasks(tasks);
 
-        RecyclerView tasksRV = findViewById(R.id.recyclerView);
+        RecyclerView tasksRV = findViewById(R.id.tasks_rv);
         tasksRV.setAdapter(tasksAdapter);
 
-        container = findViewById(R.id.inner_container);
     }
 
     private void openAddActivity() {
@@ -68,31 +72,25 @@ public class MainActivity extends AppCompatActivity implements TaskClickCallback
 
     @Override
     public void onTaskTapped(UserTask task, int pos) {
-        switch (task.getState()) {
-
-            case READY:
-                task.setState(TaskState.PROCESSING);
-                break;
-            case PROCESSING:
-                task.setState(TaskState.DONE);
-                break;
-            case DONE:
-                Toast.makeText(this, "done", Toast.LENGTH_SHORT).show();
-                break;
-        }
-        tasksAdapter.notifyItemChanged(pos);
-
-        container.setVisibility(View.VISIBLE);
-        updateFragment(task);
+        updateFragment(task, pos);
     }
 
-    private void updateFragment(UserTask task) {
-        InfoFragment infoFragment = InfoFragment.newInstance(task);
+    private void updateFragment(UserTask task, int pos) {
+        FragmentManager manager = getSupportFragmentManager();
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.inner_container, infoFragment)
-                .commit();
+        final String tag = "infoFragment";
+
+        Fragment infoFragment = manager.findFragmentByTag(tag);
+
+        if (infoFragment != null) {
+            ((InfoUpdatable) infoFragment).updateInfo(task);
+        } else {
+            manager.beginTransaction()
+                    .replace(R.id.inner_container, InfoFragment.newInstance(task, pos), tag)
+                    .commit();
+
+        }
+
     }
 
     @Override
@@ -118,5 +116,10 @@ public class MainActivity extends AppCompatActivity implements TaskClickCallback
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void UpdateItem(int position) {
+        tasksAdapter.notifyItemChanged(position);
     }
 }
