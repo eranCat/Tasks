@@ -12,11 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.erank.tasks.R;
 import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
-import com.erank.tasks.utils.DataManger;
+import com.erank.tasks.utils.room.Repo;
 
 import static android.R.layout.simple_spinner_dropdown_item;
 
-public class CreateEditActivity extends AppCompatActivity {
+public class CreateActivity extends AppCompatActivity {
 
     private EditText descriptionET;
     private Spinner stateSpinner;
@@ -24,13 +24,13 @@ public class CreateEditActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_edit);
+        setContentView(R.layout.activity_create);
 
         descriptionET = findViewById(R.id.desc_et);
         stateSpinner = findViewById(R.id.state_spinner);
 
         Button createBtn = findViewById(R.id.create_btn);
-        createBtn.setOnClickListener(view -> createTask());
+        createBtn.setOnClickListener(v -> createTask());
 
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this, simple_spinner_dropdown_item);
@@ -49,6 +49,7 @@ public class CreateEditActivity extends AppCompatActivity {
             descriptionET.setError("Please fill something");
             return;
         }
+
         descriptionET.setError(null);
 
         int selectedItem = stateSpinner.getSelectedItemPosition();
@@ -59,7 +60,7 @@ public class CreateEditActivity extends AppCompatActivity {
     private void addTaskAndClose(String desc, TaskState state) {
 
         UserTask userTask = new UserTask(desc, state);
-        DataManger.getInstance().addTask(userTask);
+        Repo.getInstance().insertTask(userTask);
 
         Runnable finishAction = () -> {
             setResult(RESULT_OK);

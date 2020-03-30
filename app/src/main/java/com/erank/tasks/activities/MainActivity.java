@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,8 +21,8 @@ import com.erank.tasks.interfaces.InfoUpdatable;
 import com.erank.tasks.interfaces.ItemUpdatable;
 import com.erank.tasks.interfaces.TaskClickCallback;
 import com.erank.tasks.models.UserTask;
-import com.erank.tasks.utils.DataManger;
 import com.erank.tasks.utils.TasksAdapter;
+import com.erank.tasks.utils.room.Repo;
 
 import java.util.List;
 
@@ -40,18 +39,20 @@ public class MainActivity extends AppCompatActivity
 
         findViewById(R.id.add).setOnClickListener(v -> openAddActivity());
 
-        tasksAdapter = new TasksAdapter(this);
-
-        List<UserTask> tasks = DataManger.getInstance().getTasks();
-        tasksAdapter.setTasks(tasks);
-
         RecyclerView tasksRV = findViewById(R.id.tasks_rv);
+        tasksAdapter = new TasksAdapter(this);
         tasksRV.setAdapter(tasksAdapter);
 
+        refreshTask();
+    }
+
+    private void refreshTask() {
+        List<UserTask> tasks = Repo.getInstance().getTasks();
+        tasksAdapter.setTasks(tasks);
     }
 
     private void openAddActivity() {
-        Intent intent = new Intent(this, CreateEditActivity.class);
+        Intent intent = new Intent(this, CreateActivity.class);
         startActivityForResult(intent, RC_ADD);
     }
 
@@ -59,23 +60,15 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RC_ADD) {
-            if (resultCode == RESULT_OK) {
-                List<UserTask> tasks = DataManger.getInstance().getTasks();
-                tasksAdapter.setTasks(tasks);
-                tasksAdapter.notifyItemInserted(tasks.size() - 1);
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "canceled", Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode == RC_ADD && resultCode == RESULT_OK) {
+            List<UserTask> tasks = Repo.getInstance().getTasks();
+            tasksAdapter.setTasks(tasks);
+            tasksAdapter.notifyItemInserted(tasks.size() - 1);
         }
     }
 
     @Override
-    public void onTaskTapped(UserTask task, int pos) {
-        updateFragment(task, pos);
-    }
-
-    private void updateFragment(UserTask task, int pos) {
+    public void onTaskTapped(UserTask task) {
         FragmentManager manager = getSupportFragmentManager();
 
         final String tag = "infoFragment";
@@ -85,10 +78,10 @@ public class MainActivity extends AppCompatActivity
         if (infoFragment != null) {
             ((InfoUpdatable) infoFragment).updateInfo(task);
         } else {
+            InfoFragment fragment = InfoFragment.newInstance(task.getId());
             manager.beginTransaction()
-                    .replace(R.id.inner_container, InfoFragment.newInstance(task, pos), tag)
+                    .replace(R.id.inner_container, fragment, tag)
                     .commit();
-
         }
 
     }
@@ -112,14 +105,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.sort) {
-            tasksAdapter.sort();
+            List<UserTask> tasks = Repo.getInstance().getTasksOrderedByState();
+            tasksAdapter.setTasks(tasks);
+            tasksAdapter.notifyDataSetChanged();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void UpdateItem(int position) {
-        tasksAdapter.notifyItemChanged(position);
+    public void UpdateItem(long id) {
+        refreshTask();
+        tasksAdapter.notifyDataSetChanged();
     }
 }

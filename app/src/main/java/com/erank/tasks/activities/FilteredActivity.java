@@ -10,8 +10,8 @@ import com.erank.tasks.R;
 import com.erank.tasks.interfaces.TaskClickCallback;
 import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
-import com.erank.tasks.utils.DataManger;
 import com.erank.tasks.utils.TasksAdapter;
+import com.erank.tasks.utils.room.Repo;
 
 public class FilteredActivity extends AppCompatActivity implements TaskClickCallback {
 
@@ -23,14 +23,14 @@ public class FilteredActivity extends AppCompatActivity implements TaskClickCall
         TaskState state = (TaskState) getIntent().getSerializableExtra("state");
 
         TasksAdapter tasksAdapter = new TasksAdapter(this);
-        tasksAdapter.setTasks(DataManger.getInstance().getFiltered(state));
+        tasksAdapter.setTasks(Repo.getInstance().getFilteredTasks(state));
 
         RecyclerView tasksRv = findViewById(R.id.tasks_rv);
         tasksRv.setAdapter(tasksAdapter);
     }
 
     @Override
-    public void onTaskTapped(UserTask task, int pos) {
+    public void onTaskTapped(UserTask task) {
         Toast.makeText(this, task.getDescription(), Toast.LENGTH_SHORT).show();
     }
 }
