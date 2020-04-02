@@ -10,9 +10,6 @@
         android:supportsRtl="true"
         android:name=".utils.App"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".activities.FilteredActivity"
-            android:parentActivityName=".activities.MainActivity" />
 
         <activity
             android:name=".activities.CreateActivity"

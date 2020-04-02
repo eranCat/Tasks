@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +20,7 @@ import com.erank.tasks.interfaces.DeleteCallback;
 import com.erank.tasks.interfaces.InfoUpdatable;
 import com.erank.tasks.interfaces.ItemUpdatable;
 import com.erank.tasks.interfaces.TaskClickCallback;
+import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
 import com.erank.tasks.utils.TasksAdapter;
 import com.erank.tasks.utils.room.Repo;
@@ -54,8 +54,24 @@ public class MainActivity extends AppCompatActivity
             tasksRV.setAdapter(tasksAdapter);
         });
 
-        // TODO: 02/04/2020 make toggle for filter buttons
-        //  and change on list instead of another activity
+        findViewById(R.id.todo_btn)
+                .setOnClickListener(v -> filterTasks(TaskState.TO_DO));
+
+        findViewById(R.id.process_btn)
+                .setOnClickListener(v -> filterTasks(TaskState.PROCESSING));
+
+        findViewById(R.id.done_btn)
+                .setOnClickListener(v -> filterTasks(TaskState.DONE));
+
+        findViewById(R.id.reset_btn)
+                .setOnClickListener(v -> resetData());
+    }
+
+    private void filterTasks(TaskState state) {
+        Repo.getFilteredTasks(state, tasks -> {
+            tasksAdapter.submitList(tasks);
+            tasksAdapter.notifyDataSetChanged();
+        });
     }
 
     @Override
@@ -135,10 +151,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDelete(int pos, UserTask task) {
-        tasksAdapter.getCurrentList().remove(pos);
-        tasksAdapter.notifyItemRemoved(pos);
-        Toast.makeText(this, "Removed " + task.getDescription(),
-                Toast.LENGTH_SHORT).show();
+        Repo.getTasks(tasks -> {
+            tasksAdapter.submitList(tasks);
+            tasksAdapter.notifyItemRemoved(pos);
+        });
     }
 
     @Override

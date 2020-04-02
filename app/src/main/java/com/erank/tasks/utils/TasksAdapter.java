@@ -59,7 +59,7 @@ public class TasksAdapter extends ListAdapter<UserTask, TasksAdapter.TaskVH> {
 
         private static View inflate(@NonNull ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            return inflater.inflate(R.layout.task_cell, parent, false);
+            return inflater.inflate(R.layout.task_cell_custom, parent, false);
         }
 
         void fill(UserTask task) {

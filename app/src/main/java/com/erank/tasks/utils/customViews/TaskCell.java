@@ -2,7 +2,6 @@ package com.erank.tasks.utils.customViews;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
@@ -38,7 +37,7 @@ public class TaskCell extends LinearLayout {
     }
 
     private void init() {
-        inflate(getContext(), R.layout.task, this);
+        inflate(getContext(), R.layout.task_item, this);
 
         descET = findViewById(R.id.desc_tv);
     }
@@ -49,17 +48,14 @@ public class TaskCell extends LinearLayout {
         switch (task.getState()) {
             case TO_DO:
                 setBgColor(R.color.colorTodo);
-                descET.setTextColor(Color.WHITE);
                 break;
 
             case PROCESSING:
                 setBgColor(R.color.colorProcessing);
-                descET.setTextColor(Color.BLACK);
                 break;
 
             case DONE:
                 setBgColor(R.color.colorDone);
-                descET.setTextColor(Color.BLACK);
                 break;
         }
     }
