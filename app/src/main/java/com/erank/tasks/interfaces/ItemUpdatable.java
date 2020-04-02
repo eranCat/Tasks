@@ -1,5 +1,7 @@
 package com.erank.tasks.interfaces;
 
+import com.erank.tasks.models.UserTask;
+
 public interface ItemUpdatable {
-    void UpdateItem(long id);
+    void updateItem(UserTask task, int taskPos);
 }

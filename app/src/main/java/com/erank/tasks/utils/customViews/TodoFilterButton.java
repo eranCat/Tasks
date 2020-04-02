@@ -3,6 +3,8 @@ package com.erank.tasks.utils.customViews;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import androidx.core.content.ContextCompat;
+
 import com.erank.tasks.models.TaskState;
 
 public class TodoFilterButton extends FilterButton {
@@ -29,6 +31,6 @@ public class TodoFilterButton extends FilterButton {
 
     @Override
     protected int getColor() {
-        return getResources().getColor(BG_COLOR);
+        return ContextCompat.getColor(getContext(), BG_COLOR);
     }
 }

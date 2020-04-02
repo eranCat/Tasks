@@ -1,12 +1,14 @@
 package com.erank.tasks.utils.customViews;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 
 import com.erank.tasks.R;
@@ -36,9 +38,7 @@ public class TaskCell extends LinearLayout {
     }
 
     private void init() {
-        LayoutInflater inflater = (LayoutInflater) getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.task, this, true);
+        inflate(getContext(), R.layout.task, this);
 
         descET = findViewById(R.id.desc_tv);
     }
@@ -47,18 +47,28 @@ public class TaskCell extends LinearLayout {
         descET.setText(task.getDescription());
 
         switch (task.getState()) {
-            case PROCESSING:
-                setBackgroundColor(Color.YELLOW);
+            case TO_DO:
+                setBgColor(R.color.colorTodo);
+                descET.setTextColor(Color.WHITE);
                 break;
 
-            case TO_DO:
-                setBackgroundColor(Color.WHITE);
+            case PROCESSING:
+                setBgColor(R.color.colorProcessing);
+                descET.setTextColor(Color.BLACK);
                 break;
 
             case DONE:
-                setBackgroundColor(Color.GREEN);
+                setBgColor(R.color.colorDone);
+                descET.setTextColor(Color.BLACK);
                 break;
         }
+    }
 
+    private void setBgColor(@ColorRes int colorRes) {
+        Resources rss = getResources();
+        int color = rss.getColor(colorRes);
+        Drawable round = rss.getDrawable(R.drawable.round);
+        round.setTint(color);
+        setBackground(round);
     }
 }

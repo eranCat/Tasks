@@ -14,11 +14,14 @@
             android:name=".activities.FilteredActivity"
             android:parentActivityName=".activities.MainActivity" />
 
-        <activity android:name=".activities.CreateActivity" />
+        <activity
+            android:name=".activities.CreateActivity"
+            android:parentActivityName=".activities.MainActivity" />
 
         <activity
             android:name=".activities.MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

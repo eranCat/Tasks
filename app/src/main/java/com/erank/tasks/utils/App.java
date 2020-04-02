@@ -11,6 +11,6 @@ public class App extends Application {
         super.onCreate();
         Stetho.initializeWithDefaults(this);
 
-        Repo.getInstance().initRoom(this);
+        Repo.initRoom(this);
     }
 }

@@ -21,12 +21,14 @@ public interface TasksDao {
     @Query("select * from tasks")
     List<UserTask> getTasks();
 
-
     @Query("select * from tasks order by state")
     List<UserTask> getTasksOrderedByState();
 
     @Query("select * from tasks where state = :state")
     List<UserTask> getFilteredByState(TaskState state);
+
+    @Query("select * from tasks where description like :query")
+    List<UserTask> getFiltered(String query);
 
     @Query("select * from tasks where id = :id")
     UserTask getTask(long id);

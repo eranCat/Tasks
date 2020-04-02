@@ -41,16 +41,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#FFEE58"
             android:padding="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/task" />
+            tools:listitem="@layout/task_cell" />
 
         <FrameLayout
             android:id="@+id/inner_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="2" />
+            android:layout_weight="1"
+            android:background="#4DD0E1" />
 
     </LinearLayout>
 

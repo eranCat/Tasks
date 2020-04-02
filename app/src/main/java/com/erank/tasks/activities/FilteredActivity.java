@@ -22,15 +22,14 @@ public class FilteredActivity extends AppCompatActivity implements TaskClickCall
 
         TaskState state = (TaskState) getIntent().getSerializableExtra("state");
 
-        TasksAdapter tasksAdapter = new TasksAdapter(this);
-        tasksAdapter.setTasks(Repo.getInstance().getFilteredTasks(state));
-
         RecyclerView tasksRv = findViewById(R.id.tasks_rv);
-        tasksRv.setAdapter(tasksAdapter);
+
+        Repo.getFilteredTasks(state, tasks ->
+                tasksRv.setAdapter(new TasksAdapter(tasks, this)));
     }
 
     @Override
-    public void onTaskTapped(UserTask task) {
+    public void onTaskTapped(UserTask task, int pos) {
         Toast.makeText(this, task.getDescription(), Toast.LENGTH_SHORT).show();
     }
 }

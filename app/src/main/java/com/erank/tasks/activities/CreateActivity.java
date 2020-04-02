@@ -1,25 +1,21 @@
 package com.erank.tasks.activities;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.erank.tasks.R;
 import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
+import com.erank.tasks.utils.customViews.TaskStatesSpinner;
 import com.erank.tasks.utils.room.Repo;
-
-import static android.R.layout.simple_spinner_dropdown_item;
 
 public class CreateActivity extends AppCompatActivity {
 
     private EditText descriptionET;
-    private Spinner stateSpinner;
+    private TaskStatesSpinner stateSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,16 +27,6 @@ public class CreateActivity extends AppCompatActivity {
 
         Button createBtn = findViewById(R.id.create_btn);
         createBtn.setOnClickListener(v -> createTask());
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this, simple_spinner_dropdown_item);
-
-        for (TaskState state : TaskState.values()) {
-            arrayAdapter.add(state.capitalizedName());
-        }
-
-        stateSpinner.setAdapter(arrayAdapter);
-        stateSpinner.setSelection(1);//Set to ready
     }
 
     private void createTask() {
@@ -52,27 +38,16 @@ public class CreateActivity extends AppCompatActivity {
 
         descriptionET.setError(null);
 
-        int selectedItem = stateSpinner.getSelectedItemPosition();
-        TaskState state = TaskState.values()[selectedItem];
+        TaskState state = stateSpinner.getSelectedState();
         addTaskAndClose(desc, state);
     }
 
     private void addTaskAndClose(String desc, TaskState state) {
 
-        UserTask userTask = new UserTask(desc, state);
-        Repo.getInstance().insertTask(userTask);
-
-        Runnable finishAction = () -> {
+        Repo.insertTask(() -> {
             setResult(RESULT_OK);
             finish();
-        };
-
-        new AlertDialog.Builder(this)
-                .setTitle("Good news")
-                .setMessage("Added successfully!")
-                .setPositiveButton("OK", (d, i) -> finishAction.run())
-                .setOnDismissListener(d -> finishAction.run())
-                .show();
+        }, new UserTask(desc, state));
     }
 
     @Override

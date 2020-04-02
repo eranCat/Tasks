@@ -6,6 +6,8 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
+
 @Entity(tableName = "tasks")
 public class UserTask {
 
@@ -57,5 +59,20 @@ public class UserTask {
 
     public void setState(TaskState state) {
         this.state = state;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserTask userTask = (UserTask) o;
+        return id == userTask.id &&
+                Objects.equals(description, userTask.description) &&
+                state == userTask.state;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, description, state);
     }
 }
