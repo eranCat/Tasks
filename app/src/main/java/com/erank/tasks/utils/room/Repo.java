@@ -19,6 +19,7 @@ import java.util.List;
 public class Repo {
     private static final String DB_NAME = "db_task";
     private static Repo instance;
+
     private TasksDao tasksDao;
 
     private Repo() {
@@ -40,8 +41,8 @@ public class Repo {
         getInstance().tasksDao = dao;
     }
 
-    public static void insertTask(InsertTaskCallback doneCallback, UserTask... tasks) {
-        runOnBackground(() -> dao().insert(tasks), doneCallback::onInsertDone);
+    public static void insertTask(UserTask task, InsertTaskCallback doneCallback) {
+        runOnBackground(() -> dao().insert(task), doneCallback::onInsertDone);
     }
 
     private static void runOnBackground(Runnable task, Runnable done) {

@@ -1,7 +1,7 @@
 package com.erank.tasks.models;
 
 public enum TaskState {
-    PROCESSING, TO_DO, DONE;
+    TO_DO, PROCESSING, DONE;
 
     public String capitalizedName() {
         String name = name().replace("_", " ");

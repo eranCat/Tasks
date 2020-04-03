@@ -107,7 +107,7 @@ public class InfoFragment extends Fragment
 
             Context context = getContext();
             if (context instanceof DeleteCallback) {
-                ((DeleteCallback) context).onDelete(taskPos, task);
+                ((DeleteCallback) context).onDelete(task, taskPos);
             }
         });
     }
@@ -116,7 +116,7 @@ public class InfoFragment extends Fragment
     public void updateInfo(UserTask task, int taskPos) {
         this.task = task;
         this.taskPos = taskPos;
-        if (getView() == null) return;
+        if (getView() == null || task == null) return;
 
         descEt.setText(task.getDescription());
         TaskState state = task.getState();

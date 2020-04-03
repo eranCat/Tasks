@@ -44,10 +44,10 @@ public class CreateActivity extends AppCompatActivity {
 
     private void addTaskAndClose(String desc, TaskState state) {
 
-        Repo.insertTask(() -> {
+        Repo.insertTask(new UserTask(desc, state), () -> {
             setResult(RESULT_OK);
             finish();
-        }, new UserTask(desc, state));
+        });
     }
 
     @Override

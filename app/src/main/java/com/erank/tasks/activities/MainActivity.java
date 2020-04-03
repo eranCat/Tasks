@@ -1,17 +1,24 @@
 package com.erank.tasks.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.erank.tasks.R;
@@ -22,13 +29,17 @@ import com.erank.tasks.interfaces.ItemUpdatable;
 import com.erank.tasks.interfaces.TaskClickCallback;
 import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
+import com.erank.tasks.utils.SwipeToDeleteCallback;
 import com.erank.tasks.utils.TasksAdapter;
 import com.erank.tasks.utils.room.Repo;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements TaskClickCallback, ItemUpdatable, DeleteCallback,
         SearchView.OnQueryTextListener,
-        MenuItem.OnActionExpandListener {
+        MenuItem.OnActionExpandListener, SwipeToDeleteCallback.onSwipeCallback {
 
     private final int RC_ADD = 123;//check
     private TasksAdapter tasksAdapter;
@@ -48,11 +59,14 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.add).setOnClickListener(v -> openAddActivity());
 
         RecyclerView tasksRV = findViewById(R.id.tasks_rv);
+        tasksAdapter = new TasksAdapter(this);
+        tasksRV.setAdapter(tasksAdapter);
 
-        Repo.getTasks(tasks -> {
-            tasksAdapter = new TasksAdapter(tasks, this);
-            tasksRV.setAdapter(tasksAdapter);
-        });
+        SwipeToDeleteCallback callback = new SwipeToDeleteCallback(this);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(tasksRV);
+
+        resetData();
 
         findViewById(R.id.todo_btn)
                 .setOnClickListener(v -> filterTasks(TaskState.TO_DO));
@@ -68,10 +82,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void filterTasks(TaskState state) {
-        Repo.getFilteredTasks(state, tasks -> {
-            tasksAdapter.submitList(tasks);
-            tasksAdapter.notifyDataSetChanged();
-        });
+        Repo.getFilteredTasks(state, tasksAdapter::submitList);
     }
 
     @Override
@@ -81,7 +92,6 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == RC_ADD && resultCode == RESULT_OK) {
             Repo.getTasks(tasks -> {
                 tasksAdapter.submitList(tasks);
-                tasksAdapter.notifyItemInserted(tasks.size() - 1);
 
                 new AlertDialog.Builder(this)
                         .setTitle("Good news")
@@ -127,34 +137,35 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.sort) {
+
             isSorting = !isSorting;
-            if (!isSorting) {
-                resetData();
+
+            @ColorInt int tint;
+
+            if (isSorting) {
+                Repo.getTasksOrderedByState(tasksAdapter::submitList);
+                tint = Color.GREEN;
             } else {
-                Repo.getTasksOrderedByState(tasks -> {
-                    tasksAdapter.submitList(tasks);
-                    tasksAdapter.notifyDataSetChanged();
-                });
+                resetData();
+                tint = Color.WHITE;
             }
+
+            Drawable wrappedDrawable = DrawableCompat.wrap(item.getIcon());
+            DrawableCompat.setTint(wrappedDrawable, tint);
+
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void updateItem(UserTask task, int taskPos) {
-        Repo.getTasks(tasks -> {
-            tasksAdapter.submitList(tasks);
-            tasksAdapter.notifyItemChanged(taskPos);
-        });
+    public void updateItem(UserTask task, int pos) {
+        resetData();
     }
 
     @Override
-    public void onDelete(int pos, UserTask task) {
-        Repo.getTasks(tasks -> {
-            tasksAdapter.submitList(tasks);
-            tasksAdapter.notifyItemRemoved(pos);
-        });
+    public void onDelete(UserTask task, int pos) {
+        resetData();
     }
 
     @Override
@@ -164,10 +175,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Repo.getFilteredTasks(newText, tasks -> {
-            tasksAdapter.submitList(tasks);
-            tasksAdapter.notifyDataSetChanged();
-        });
+        Repo.getFilteredTasks(newText, tasksAdapter::submitList);
         return true;
     }
 
@@ -183,9 +191,35 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void resetData() {
-        Repo.getTasks(tasks -> {
-            tasksAdapter.submitList(tasks);
-            tasksAdapter.notifyDataSetChanged();
+        Repo.getTasks(tasksAdapter::submitList);
+    }
+
+    @Override
+    public void onSwiped(int position) {
+        UserTask task = tasksAdapter.getCurrentList().get(position);
+        Repo.deleteTask(task, () -> {
+            resetData();
+            showUndoSnackbar(task, position);
+        });
+    }
+
+    private void showUndoSnackbar(UserTask task, int position) {
+        View view = findViewById(R.id.main_layout);
+
+        String msg = String.format("Task %s deleted", task.getDescription());
+
+        Snackbar.make(view, msg, Snackbar.LENGTH_LONG)
+                .setAction("Undo delete", v -> undoDelete(task, position))
+                .show();
+    }
+
+    private void undoDelete(UserTask task, int position) {
+        ArrayList<UserTask> userTasks = new ArrayList<>(tasksAdapter.getCurrentList());
+        userTasks.add(position, task);
+        tasksAdapter.submitList(userTasks);
+
+        Repo.insertTask(task, () -> {
+            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
         });
     }
 }
