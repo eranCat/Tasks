@@ -127,6 +127,8 @@ public class InfoFragment extends Fragment
 
     @Override
     public void onSelected(TaskState state) {
+        if(task == null)return;
+        
         task.setState(state);
         Repo.updateTask(() -> {
             Context context = getContext();
