@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.erank.tasks.interfaces.onSwipeCallback;
+
 public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
 
     private onSwipeCallback callback;
@@ -26,7 +28,4 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
         callback.onSwiped(position);
     }
 
-    public interface onSwipeCallback {
-        void onSwiped(int position);
-    }
 }

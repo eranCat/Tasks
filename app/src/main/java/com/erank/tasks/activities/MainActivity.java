@@ -12,7 +12,6 @@ import android.widget.Toast;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -27,6 +26,7 @@ import com.erank.tasks.interfaces.DeleteCallback;
 import com.erank.tasks.interfaces.InfoUpdatable;
 import com.erank.tasks.interfaces.ItemUpdatable;
 import com.erank.tasks.interfaces.TaskClickCallback;
+import com.erank.tasks.interfaces.onSwipeCallback;
 import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
 import com.erank.tasks.utils.SwipeToDeleteCallback;
@@ -35,15 +35,20 @@ import com.erank.tasks.utils.room.Repo;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import static com.erank.tasks.models.TaskState.DONE;
+import static com.erank.tasks.models.TaskState.PROCESSING;
+import static com.erank.tasks.models.TaskState.TO_DO;
 
 public class MainActivity extends AppCompatActivity
         implements TaskClickCallback, ItemUpdatable, DeleteCallback,
         SearchView.OnQueryTextListener,
-        MenuItem.OnActionExpandListener, SwipeToDeleteCallback.onSwipeCallback {
+        MenuItem.OnActionExpandListener, onSwipeCallback {
 
+    final String INFO_FRAGMENT_TAG = "infoFragment";
     private final int RC_ADD = 123;//check
     private TasksAdapter tasksAdapter;
-
     private boolean isSorting;
 
     private void openAddActivity() {
@@ -69,13 +74,13 @@ public class MainActivity extends AppCompatActivity
         resetData();
 
         findViewById(R.id.todo_btn)
-                .setOnClickListener(v -> filterTasks(TaskState.TO_DO));
+                .setOnClickListener(v -> filterTasks(TO_DO));
 
         findViewById(R.id.process_btn)
-                .setOnClickListener(v -> filterTasks(TaskState.PROCESSING));
+                .setOnClickListener(v -> filterTasks(PROCESSING));
 
         findViewById(R.id.done_btn)
-                .setOnClickListener(v -> filterTasks(TaskState.DONE));
+                .setOnClickListener(v -> filterTasks(DONE));
 
         findViewById(R.id.reset_btn)
                 .setOnClickListener(v -> resetData());
@@ -92,31 +97,26 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == RC_ADD && resultCode == RESULT_OK) {
             Repo.getTasks(tasks -> {
                 tasksAdapter.submitList(tasks);
-
-                new AlertDialog.Builder(this)
-                        .setTitle("Good news")
-                        .setMessage("Added successfully!")
-                        .setPositiveButton("OK", null)
-                        .show();
+                toast("Added successfully!");
             });
         }
+    }
+
+    private void toast(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onTaskTapped(UserTask task, int pos) {
         FragmentManager manager = getSupportFragmentManager();
 
-        final String tag = "infoFragment";
+        Fragment fragment = manager.findFragmentByTag(INFO_FRAGMENT_TAG);
 
-        Fragment infoFragment = manager.findFragmentByTag(tag);
-
-        if (infoFragment != null) {
-            ((InfoUpdatable) infoFragment).updateInfo(task, pos);
+        if (fragment != null) {
+            ((InfoUpdatable) fragment).updateInfo(task, pos);
         } else {
-            InfoFragment fragment = InfoFragment.newInstance(task.getId(), pos);
-            manager.beginTransaction()
-                    .replace(R.id.inner_container, fragment, tag)
-                    .commit();
+            InfoFragment infoFragment = InfoFragment.newInstance(task.getId(), pos);
+            infoFragment.show(manager, INFO_FRAGMENT_TAG);
         }
 
     }
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity
 
             if (isSorting) {
                 Repo.getTasksOrderedByState(tasksAdapter::submitList);
-                tint = Color.GREEN;
+                tint = R.color.colorPrimaryDark;
             } else {
                 resetData();
                 tint = Color.WHITE;
@@ -166,6 +166,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDelete(UserTask task, int pos) {
         resetData();
+        FragmentManager manager = getSupportFragmentManager();
+        Fragment fragment = manager.findFragmentByTag(INFO_FRAGMENT_TAG);
+        if (fragment != null) {
+            manager.beginTransaction().remove(fragment).commit();
+        }
     }
 
     @Override
@@ -206,7 +211,7 @@ public class MainActivity extends AppCompatActivity
     private void showUndoSnackbar(UserTask task, int position) {
         View view = findViewById(R.id.main_layout);
 
-        String msg = String.format("Task %s deleted", task.getDescription());
+        String msg = getString(R.string.task_deleted, task.getDetails());
 
         Snackbar.make(view, msg, Snackbar.LENGTH_LONG)
                 .setAction("Undo delete", v -> undoDelete(task, position))
@@ -214,12 +219,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void undoDelete(UserTask task, int position) {
-        ArrayList<UserTask> userTasks = new ArrayList<>(tasksAdapter.getCurrentList());
+        List<UserTask> userTasks = new ArrayList<>(tasksAdapter.getCurrentList());
         userTasks.add(position, task);
         tasksAdapter.submitList(userTasks);
 
         Repo.insertTask(task, () -> {
-            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+            toast("Restored");
         });
     }
 }

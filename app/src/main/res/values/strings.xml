@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Tasks</string>
+    <string name="task_deleted">Task %s deleted</string>
 </resources>

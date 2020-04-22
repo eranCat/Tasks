@@ -8,12 +8,12 @@ import java.util.Date;
 
 public class Converters {
     @TypeConverter
-    public Date fromTimestamp(Long value) {
+    public static Date toDate(Long value) {
         return value == null ? null : new Date(value);
     }
 
     @TypeConverter
-    public Long dateToTimestamp(Date date) {
+    public static Long dateToTimestamp(Date date) {
         if (date == null) {
             return null;
         } else {
@@ -22,12 +22,18 @@ public class Converters {
     }
 
     @TypeConverter
-    public TaskState fromState(Integer ordinal) {
-        return ordinal == null ? null : TaskState.values()[ordinal];
+    public static TaskState toState(Integer ordinal) {
+        if (ordinal == null) return null;
+
+        TaskState[] values = TaskState.values();
+        if (ordinal < 0 || ordinal >= values.length)
+            return null;
+
+        return values[ordinal];
     }
 
     @TypeConverter
-    public Integer stateToOrdinal(TaskState state) {
+    public static Integer stateToOrdinal(TaskState state) {
         return state.ordinal();
     }
 }

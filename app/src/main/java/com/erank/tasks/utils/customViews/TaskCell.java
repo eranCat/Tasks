@@ -11,9 +11,26 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 
 import com.erank.tasks.R;
+import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.erank.tasks.models.TaskState.DONE;
+import static com.erank.tasks.models.TaskState.PROCESSING;
+import static com.erank.tasks.models.TaskState.TO_DO;
+
 public class TaskCell extends LinearLayout {
+    private static Map<TaskState, Integer> colors;
+
+    static {
+        colors = new HashMap<>();
+        colors.put(TO_DO, R.color.colorTodo);
+        colors.put(PROCESSING, R.color.colorProcessing);
+        colors.put(DONE, R.color.colorDone);
+    }
+
     private TextView descET;
 
     public TaskCell(Context context) {
@@ -43,21 +60,9 @@ public class TaskCell extends LinearLayout {
     }
 
     public void setTask(UserTask task) {
-        descET.setText(task.getDescription());
-
-        switch (task.getState()) {
-            case TO_DO:
-                setBgColor(R.color.colorTodo);
-                break;
-
-            case PROCESSING:
-                setBgColor(R.color.colorProcessing);
-                break;
-
-            case DONE:
-                setBgColor(R.color.colorDone);
-                break;
-        }
+        descET.setText(task.getDetails());
+        TaskState state = task.getState();
+        setBgColor(colors.get(state));
     }
 
     private void setBgColor(@ColorRes int colorRes) {
