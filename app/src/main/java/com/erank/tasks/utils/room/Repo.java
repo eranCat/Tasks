@@ -25,7 +25,7 @@ public class Repo {
     private Repo() {
     }
 
-    private static Repo getInstance() {
+    public static Repo getInstance() {
         return instance != null ? instance : (instance = new Repo());
     }
 

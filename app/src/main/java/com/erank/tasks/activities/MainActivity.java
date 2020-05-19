@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void filterTasks(TaskState state) {
-        Repo.getFilteredTasks(state, tasksAdapter::submitList);
+        viewModel.getFilteredTasks(state, tasksAdapter::submitList);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_ADD && resultCode == RESULT_OK) {
-            Repo.getTasks(tasks -> {
+            viewModel.getTasks(tasks -> {
                 tasksAdapter.submitList(tasks);
                 toast("Added successfully!");
             });
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity
             @ColorInt int tint;
 
             if (isSorting) {
-                Repo.getTasksOrderedByState(tasksAdapter::submitList);
+                viewModel.getTasksOrderedByState(tasksAdapter::submitList);
                 tint = R.color.colorPrimaryDark;
             } else {
                 resetData();
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Repo.getFilteredTasks(newText, tasksAdapter::submitList);
+        viewModel.getFilteredTasks(newText, tasksAdapter::submitList);
         return true;
     }
 
@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSwiped(int position) {
         UserTask task = tasksAdapter.getCurrentList().get(position);
-        Repo.deleteTask(task, () -> {
+        viewModel.deleteTask(task, () -> {
             resetData();
             showUndoSnackbar(task, position);
         });
@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity
         userTasks.add(position, task);
         tasksAdapter.submitList(userTasks);
 
-        Repo.insertTask(task, () -> {
+        viewModel.insertTask(task, () -> {
             toast("Restored");
         });
     }
