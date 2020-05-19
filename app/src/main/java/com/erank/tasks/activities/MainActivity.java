@@ -37,6 +37,8 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import static com.erank.tasks.models.TaskState.DONE;
 import static com.erank.tasks.models.TaskState.PROCESSING;
 import static com.erank.tasks.models.TaskState.TO_DO;
@@ -45,6 +47,9 @@ public class MainActivity extends AppCompatActivity
         implements TaskClickCallback, ItemUpdatable, DeleteCallback,
         SearchView.OnQueryTextListener,
         MenuItem.OnActionExpandListener, onSwipeCallback {
+
+    @Inject
+    MainViewModel viewModel;
 
     final String INFO_FRAGMENT_TAG = "infoFragment";
     private final int RC_ADD = 123;//check
