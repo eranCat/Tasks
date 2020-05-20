@@ -1,4 +1,4 @@
-package com.erank.tasks.activities;
+package com.erank.tasks.activities.create;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -9,18 +9,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.erank.tasks.R;
 import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
+import com.erank.tasks.utils.App;
 import com.erank.tasks.utils.customViews.TaskStatesSpinner;
-import com.erank.tasks.utils.room.Repo;
+
+import javax.inject.Inject;
 
 public class CreateActivity extends AppCompatActivity {
 
     private EditText descriptionET;
     private TaskStatesSpinner stateSpinner;
 
+    @Inject
+    CreateActivityViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
+
+        ((App) getApplicationContext()).getAppComponent().inject(this);
 
         descriptionET = findViewById(R.id.desc_et);
         stateSpinner = findViewById(R.id.state_spinner);
@@ -44,7 +51,7 @@ public class CreateActivity extends AppCompatActivity {
 
     private void addTaskAndClose(String desc, TaskState state) {
 
-        Repo.insertTask(new UserTask(desc, state), () -> {
+        viewModel.insertTask(new UserTask(desc, state), () -> {
             setResult(RESULT_OK);
             finish();
         });

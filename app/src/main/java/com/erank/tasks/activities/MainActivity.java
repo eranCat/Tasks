@@ -21,7 +21,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.erank.tasks.R;
-import com.erank.tasks.fragments.InfoFragment;
+import com.erank.tasks.activities.create.CreateActivity;
+import com.erank.tasks.fragments.info.InfoFragment;
 import com.erank.tasks.interfaces.DeleteCallback;
 import com.erank.tasks.interfaces.InfoUpdatable;
 import com.erank.tasks.interfaces.ItemUpdatable;
@@ -29,9 +30,9 @@ import com.erank.tasks.interfaces.TaskClickCallback;
 import com.erank.tasks.interfaces.onSwipeCallback;
 import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
+import com.erank.tasks.utils.App;
 import com.erank.tasks.utils.SwipeToDeleteCallback;
 import com.erank.tasks.utils.TasksAdapter;
-import com.erank.tasks.utils.room.Repo;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ((App) getApplicationContext()).getAppComponent().inject(this);
 
         findViewById(R.id.add).setOnClickListener(v -> openAddActivity());
 
@@ -201,7 +204,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void resetData() {
-        Repo.getTasks(tasksAdapter::submitList);
+        viewModel.getTasks(tasksAdapter::submitList);
     }
 
     @Override

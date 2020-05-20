@@ -1,4 +1,4 @@
-package com.erank.tasks.fragments;
+package com.erank.tasks.fragments.info;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -21,8 +21,8 @@ import com.erank.tasks.interfaces.OnStateSelectedCallback;
 import com.erank.tasks.interfaces.TextWatcherAdapter;
 import com.erank.tasks.models.TaskState;
 import com.erank.tasks.models.UserTask;
+import com.erank.tasks.utils.App;
 import com.erank.tasks.utils.customViews.TaskStatesSpinner;
-import com.erank.tasks.utils.room.Repo;
 import com.erank.tasks.utils.room.callbacks.FetchTaskCallback;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -30,11 +30,16 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.inject.Inject;
+
 public class InfoFragment extends BottomSheetDialogFragment
         implements OnStateSelectedCallback,
         TextWatcherAdapter,
         FetchTaskCallback,
         InfoUpdatable {
+
+    @Inject
+    InfoViewModel viewModel;
 
     private EditText descEt;
     private TextView stateTv;
@@ -60,6 +65,14 @@ public class InfoFragment extends BottomSheetDialogFragment
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        ((App) context.getApplicationContext())
+                .getAppComponent()
+                .inject(this);
+        super.onAttach(context);
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -75,7 +88,7 @@ public class InfoFragment extends BottomSheetDialogFragment
 
         deleteBtn.setOnClickListener(v -> delete());
 
-        Repo.getTask(taskID, this);
+        viewModel.getTask(taskID, this);
     }
 
 
@@ -88,7 +101,7 @@ public class InfoFragment extends BottomSheetDialogFragment
         }
 
         task.setDetails(s);
-        Repo.updateTask(() -> {
+        viewModel.updateTask(() -> {
             Context context = getContext();
             if (context instanceof ItemUpdatable) {
                 ((ItemUpdatable) context).updateItem(task, taskPos);
@@ -99,7 +112,7 @@ public class InfoFragment extends BottomSheetDialogFragment
     private void delete() {
         if (task == null) return;
 
-        Repo.deleteTask(task, () -> {
+        viewModel.deleteTask(task, () -> {
 
             dismiss();
 
@@ -142,7 +155,7 @@ public class InfoFragment extends BottomSheetDialogFragment
         if(task == null)return;
         
         task.setState(state);
-        Repo.updateTask(() -> {
+        viewModel.updateTask(() -> {
             Context context = getContext();
             if (context instanceof ItemUpdatable) {
                 ((ItemUpdatable) context).updateItem(task, taskPos);

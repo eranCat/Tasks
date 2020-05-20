@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".activities.CreateActivity"
+            android:name=".activities.create.CreateActivity"
             android:parentActivityName=".activities.MainActivity" />
 
         <activity

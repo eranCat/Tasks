@@ -27,7 +27,7 @@ public interface TasksDao {
     @Query("select * from tasks where state = :state")
     List<UserTask> getFilteredByState(TaskState state);
 
-    @Query("select * from tasks where details like :query")
+    @Query("select * from tasks where details GLOB '*' || :query|| '*'")
     List<UserTask> getFiltered(String query);
 
     @Query("select * from tasks where id = :id")
