@@ -1,4 +1,4 @@
-package com.erank.tasks.activities;
+package com.erank.tasks.activities.main;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         MenuItem.OnActionExpandListener, onSwipeCallback {
 
     @Inject
-    MainViewModel viewModel;
+    public MainViewModel viewModel;
 
     final String INFO_FRAGMENT_TAG = "infoFragment";
     private final int RC_ADD = 123;//check
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ((App) getApplicationContext()).getAppComponent().inject(this);
+        ((App) getApplication()).getAppComponent().inject(this);
 
         findViewById(R.id.add).setOnClickListener(v -> openAddActivity());
 

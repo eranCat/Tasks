@@ -1,4 +1,4 @@
-package com.erank.tasks.activities;
+package com.erank.tasks.activities.main;
 
 import androidx.lifecycle.ViewModel;
 

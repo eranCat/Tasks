@@ -2,8 +2,8 @@ package com.erank.tasks.utils.dagger;
 
 import android.content.Context;
 
-import com.erank.tasks.activities.MainActivity;
 import com.erank.tasks.activities.create.CreateActivity;
+import com.erank.tasks.activities.main.MainActivity;
 import com.erank.tasks.fragments.info.InfoFragment;
 
 import javax.inject.Singleton;

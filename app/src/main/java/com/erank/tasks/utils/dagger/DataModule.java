@@ -13,11 +13,11 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class DataModule {
+class DataModule {
 
     @Provides
     @Singleton
-    public Repository provideRepository(TasksDao dao) {
+    Repository provideRepository(TasksDao dao) {
         return new RepositoryImpl(dao);
     }
 

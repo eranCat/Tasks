@@ -27,7 +27,7 @@ public class CreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
-        ((App) getApplicationContext()).getAppComponent().inject(this);
+        ((App) getApplication()).getAppComponent().inject(this);
 
         descriptionET = findViewById(R.id.desc_et);
         stateSpinner = findViewById(R.id.state_spinner);
