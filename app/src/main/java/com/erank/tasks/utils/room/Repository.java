@@ -9,6 +9,9 @@ import com.erank.tasks.utils.room.callbacks.FetchTasksCallback;
 import com.erank.tasks.utils.room.callbacks.InsertTaskCallback;
 import com.erank.tasks.utils.room.callbacks.UpdateTaskCallback;
 
+import javax.inject.Singleton;
+
+@Singleton
 public interface Repository {
     void insertTask(UserTask task, InsertTaskCallback doneCallback);
 

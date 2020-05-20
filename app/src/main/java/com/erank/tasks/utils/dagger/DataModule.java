@@ -16,6 +16,7 @@ import dagger.Provides;
 public class DataModule {
 
     @Provides
+    @Singleton
     public Repository provideRepository(TasksDao dao) {
         return new RepositoryImpl(dao);
     }
