@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         MenuItem.OnActionExpandListener, onSwipeCallback {
 
     @Inject
-    public MainViewModel viewModel;
+    MainViewModel viewModel;
 
     final String INFO_FRAGMENT_TAG = "infoFragment";
     private final int RC_ADD = 123;//check
